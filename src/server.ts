@@ -5,6 +5,7 @@ import helmet from "helmet";
 import { env } from "./lib/env";
 import { errorHandlerMiddleware } from "./middlewares/error-handler-middleware";
 import { authRouter } from "./modules/auth/auth-router";
+import { surveysRouter } from "./modules/surveys/surveys-router";
 import { usersRouter } from "./modules/users/users-router";
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(cookieParser(env.COOKIE_SECRET));
 
 app.use(authRouter);
 app.use(usersRouter);
+app.use(surveysRouter);
 app.use(errorHandlerMiddleware);
 
 app.listen(env.PORT, () => {
