@@ -64,8 +64,9 @@ model Question {
   title String
 
   choices Choice[]
-  survey Survey @relation(fields: [survey_id], references: [id])
-  survey_id String
+  survey Survey @relation(fields: [survey_id], references: [id], onDelete: Cascade)
+  survey_id String 
+
 
   @@map("questions")
 }
@@ -74,8 +75,20 @@ model Choice {
   id String @id @default(uuid())
   title String
 
-  question Question @relation(fields: [question_id], references: [id])
+  question Question @relation(fields: [question_id], references: [id], onDelete: Cascade)
   question_id String
 
   @@map("choices")
+}
+
+model Answer {
+  id String @id @default(uuid())
+  survey_id String
+  respondant_id String
+  question_title String
+  choice_title String
+  responded_at DateTime @default(now())
+
+
+  @@map("answers")
 }
