@@ -41,5 +41,11 @@ surveysRouter.patch(
   roleAndPermissionsMiddleware,
   surveysController.completeSurvey
 );
+surveysRouter.get(
+  "/surveys/:surveyID/stats",
+  withAuthMiddleware,
+  roleAndPermissionsMiddleware,
+  surveysController.getStats
+);
 
 export { surveysRouter };
