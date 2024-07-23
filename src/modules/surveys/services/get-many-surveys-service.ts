@@ -11,7 +11,8 @@ export class GetManySurveysService {
         id: true,
         title: true,
         description: true,
-        author_id: true,
+        completed_at: true,
+        created_at: true,
         author: {
           select: {
             name: true
