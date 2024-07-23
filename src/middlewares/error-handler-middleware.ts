@@ -22,19 +22,19 @@ export function errorHandlerMiddleware(
 
   if (err instanceof ClientError) {
     return res.status(400).json({
-      message: err.message
+      message: err.message ?? "Invalid input."
     });
   }
 
   if (err instanceof AuthenticationError) {
     return res.status(401).json({
-      message: "Unauthenticated access denied."
+      message: err.message ?? "Unauthenticated access denied"
     });
   }
 
   if (err instanceof AuthorizationError) {
     return res.status(403).json({
-      message: "Unauthorized access denied."
+      message: err.message ?? "Unauthorized access denied."
     });
   }
 
