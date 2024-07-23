@@ -17,5 +17,11 @@ usersRouter.get(
   withAuthMiddleware,
   usersController.getProfile
 );
+usersRouter.delete(
+  "/users/profile",
+  withAuthMiddleware,
+  roleAndPermissionsMiddleware,
+  usersController.deleteUser
+);
 
 export { usersRouter };
