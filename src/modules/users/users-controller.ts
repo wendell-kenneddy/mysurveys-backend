@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import { prisma } from "../../lib/prisma";
 import { Permission } from "@prisma/client";
 import { AuthorizationError } from "../../errors/authorization-error";
 import { CreateUserService } from "./services/create-user-service";
+import { GetUserProfileService } from "./services/get-user-profile-service";
+import { DeleteUserService } from "./services/delete-user-service";
 
 export class UsersController {
   createUser = async (req: Request, res: Response) => {
@@ -20,19 +21,13 @@ export class UsersController {
 
   getProfile = async (req: Request, res: Response) => {
     const userID: string = (req as any).userID;
-    const profile = await prisma.user.findUnique({
-      where: { id: userID },
-      select: {
-        name: true,
-        email: true,
-        responded_surveys: {
-          select: {
-            id: true,
-            title: true
-          }
-        }
-      }
-    });
+    const profile = await new GetUserProfileService().execute(userID);
     res.json({ data: profile });
+  };
+
+  deleteUser = async (req: Request, res: Response) => {
+    const userID: string = (req as any).userID;
+    await new DeleteUserService().execute(userID);
+    res.json({ message: "User successfully deleted." });
   };
 }
