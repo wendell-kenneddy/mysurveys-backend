@@ -8,11 +8,12 @@ import { DeleteSurveyService } from "./services/delete-survey-service";
 import { GetManySurveysService } from "./services/get-many-surveys-service";
 import { GetOneSurveyService } from "./services/get-one-survey-service";
 import { AnswerSurveyService } from "./services/answer-survey-service";
+import { GetSurveyStatsService } from "./services/get-survey-stats-service";
 
 export class SurveysController {
   createSurvey = async (req: Request, res: Response) => {
-    const userID: string = (req as any).userID;
     validatePermissions(req, "create-survey");
+    const userID: string = (req as any).userID;
     const surveyID = await new CreateSurveyService().execute({
       author_id: userID,
       ...req.body
@@ -36,8 +37,9 @@ export class SurveysController {
 
   getOneSurvey = async (req: Request, res: Response) => {
     validatePermissions(req, "view-survey");
+    const userID = (req as any).userID;
     const surveyID = req.params.surveyID;
-    const survey = await new GetOneSurveyService().execute(surveyID);
+    const survey = await new GetOneSurveyService().execute(surveyID, userID);
     return res.json({ data: survey });
   };
 
@@ -53,10 +55,10 @@ export class SurveysController {
     const userID: string = (req as any).userID;
     const userRole: string = (req as any).userRole;
     const surveyID = req.params.surveyID;
-    const survey = await new GetOneSurveyService().execute(surveyID);
+    const response = await new GetOneSurveyService().execute(surveyID, userID);
 
-    if (!survey) throw new ClientError("Survey not found.");
-    if (userRole != "admin" && userID != survey.author_id) {
+    if (!response) throw new ClientError("Survey not found.");
+    if (userRole != "admin" && userID != response.survey.author_id) {
       throw new AuthorizationError();
     }
     await new CompleteSurveyService().execute(surveyID);
@@ -70,14 +72,28 @@ export class SurveysController {
     const userID: string = (req as any).userID;
     const userRole: string = (req as any).userRole;
     const surveyID = req.params.surveyID;
-    const survey = await new GetOneSurveyService().execute(surveyID);
+    const response = await new GetOneSurveyService().execute(surveyID, userID);
 
-    if (!survey) throw new ClientError("Survey not found.");
-    if (userRole != "admin" && userID != survey.author_id) {
+    if (!response) throw new ClientError("Survey not found.");
+    if (userRole != "admin" && userID != response.survey.author_id) {
       throw new AuthorizationError();
     }
     await new DeleteSurveyService().execute(surveyID);
 
     return res.json({ message: "Survey successfully deleted." });
+  };
+
+  getStats = async (req: Request, res: Response) => {
+    validatePermissions(req, "view-stats");
+    const userID: string = (req as any).userID;
+    const userRole: string = (req as any).userRole;
+    const surveyID = req.params.surveyID;
+    const stats = await new GetSurveyStatsService().execute(surveyID);
+
+    if (userRole != "admin" && userID != stats.author_id) {
+      throw new AuthorizationError();
+    }
+
+    return res.json({ data: stats });
   };
 }
