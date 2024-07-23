@@ -1,0 +1,31 @@
+name: surveys-api
+
+services:
+  api:
+    container_name: api
+    build: .
+    ports:
+      - 3333:3333
+    env_file:
+      - .env
+    depends_on:
+      - db
+    restart: always
+    volumes:
+      - type: bind
+        source: ./src
+        target: /app/src
+  db:
+    container_name: postgres
+    hostname: postgres
+    image: postgres:latest
+    ports:
+      - 8080:5432
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - db-data:/etc/data
+
+volumes:
+  db-data:
