@@ -1,11 +1,13 @@
+import { ClientError } from "../../../errors/client-error";
 import { prisma } from "../../../lib/prisma";
 import { uuidSchema } from "../../../lib/uuid-schema";
 
 export class GetOneSurveyService {
-  async execute(id: string) {
-    uuidSchema.parse(id);
+  async execute(surveyID: string, userID: string) {
+    uuidSchema.parse(surveyID);
+    uuidSchema.parse(userID);
     const survey = await prisma.survey.findUnique({
-      where: { id },
+      where: { id: surveyID },
       select: {
         id: true,
         title: true,
@@ -27,6 +29,12 @@ export class GetOneSurveyService {
         }
       }
     });
-    return survey;
+
+    if (!survey) throw new ClientError("Survey not found.");
+
+    const userAnswers = await prisma.answer.findMany({
+      where: { respondant_id: userID, survey_id: surveyID }
+    });
+    return { survey, userAnswers };
   }
 }
