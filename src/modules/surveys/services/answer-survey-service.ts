@@ -35,6 +35,16 @@ export class AnswerSurveyService {
     if (surveyAnswers.answers.length != survey._count.questions)
       throw new ClientError("Not enough answers provided.");
 
+    const respondant = await prisma.user.findUnique({
+      where: { id: surveyAnswers.respondant_id },
+      select: {
+        responded_surveys: { where: { id: survey.id } }
+      }
+    });
+
+    if (respondant?.responded_surveys.length)
+      throw new ClientError("User already responded this survey.");
+
     await prisma.answer.createMany({
       data: surveyAnswers.answers.map(a => ({
         ...a,
