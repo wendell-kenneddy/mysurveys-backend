@@ -52,6 +52,7 @@ model Survey {
   completed_at DateTime?
   created_at DateTime @default(now())
   
+  answers Answer[]
   questions Question[]
   author User @relation(fields: [author_id], references: [id])
   author_id String
@@ -83,12 +84,13 @@ model Choice {
 
 model Answer {
   id String @id @default(uuid())
-  survey_id String
   respondant_id String
   question_title String
   choice_title String
   responded_at DateTime @default(now())
 
+  survey Survey @relation(fields: [survey_id], references: [id], onDelete: Cascade)
+  survey_id String
 
   @@map("answers")
 }
