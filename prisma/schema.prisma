@@ -20,7 +20,8 @@ model User {
   email String @unique
   created_at DateTime @default(now())
 
-  responded_surveys Survey[]
+  created_surveys Survey[]
+  responded_surveys SurveyRespondant[]
   role Role @relation(fields: [role_id], references: [id])
   role_id String
 
@@ -54,6 +55,7 @@ model Survey {
   
   answers Answer[]
   questions Question[]
+  respondants SurveyRespondant[]
   author User @relation(fields: [author_id], references: [id])
   author_id String
 
@@ -93,4 +95,15 @@ model Answer {
   survey_id String
 
   @@map("answers")
+}
+
+model SurveyRespondant {
+  respondant User @relation(fields: [respondant_id], references: [id], onDelete: Cascade)
+  respondant_id String
+  survey Survey @relation(fields: [survey_id], references: [id], onDelete: Cascade)
+  survey_id String
+  responded_at DateTime @default(now())
+
+  @@id([respondant_id, survey_id])
+  @@map("survey_respondants")
 }
