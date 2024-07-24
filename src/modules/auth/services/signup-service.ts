@@ -25,9 +25,26 @@ export class SignupService {
         email: newUserData.email,
         password: hashedPassword,
         role_id: respondantRole.id
+      },
+      select: {
+        id: true,
+        name: true,
+        role: {
+          select: {
+            title: true,
+            permissions: {
+              select: { action: true }
+            }
+          }
+        }
       }
     });
 
-    return newUser.id;
+    return {
+      id: newUser.id,
+      name: newUser.name,
+      role: newUser.role.title,
+      permissions: newUser.role.permissions.map(p => p.action)
+    };
   }
 }
