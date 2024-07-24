@@ -16,14 +16,17 @@ export class GetUserProfileService {
         },
         responded_surveys: {
           select: {
-            id: true,
-            title: true,
-            description: true,
-            completed_at: true,
-            created_at: true,
-            author: {
+            survey: {
               select: {
-                name: true
+                title: true,
+                description: true,
+                completed_at: true,
+                created_at: true,
+                author: {
+                  select: {
+                    name: true
+                  }
+                }
               }
             }
           }
