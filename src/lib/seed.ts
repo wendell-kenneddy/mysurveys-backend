@@ -7,6 +7,7 @@ const permissionsToCreate = [
   { action: "complete-survey" },
   { action: "delete-survey" },
   { action: "respond-survey" },
+  { action: "view-stats" },
   { action: "create-user" },
   { action: "delete-user" }
 ];
@@ -16,7 +17,7 @@ async function main() {
     data: permissionsToCreate
   });
 
-  await prisma.role.create({
+  const coordinatorRole = await prisma.role.create({
     data: {
       title: "coordinator",
       permissions: {
@@ -27,7 +28,7 @@ async function main() {
     }
   });
 
-  await prisma.role.create({
+  const respondantRole = await prisma.role.create({
     data: {
       title: "respondant",
       permissions: {
@@ -46,13 +47,27 @@ async function main() {
   });
 
   const password = await hash("12345678", 10);
-  await prisma.user.create({
-    data: {
-      name: "John Doe",
-      email: "johndoe@email.com",
-      password,
-      role_id: adminRole.id
-    }
+  await prisma.user.createMany({
+    data: [
+      {
+        name: "John Doe",
+        email: "johndoe@email.com",
+        password,
+        role_id: adminRole.id
+      },
+      {
+        name: "Mary Doe",
+        email: "marydoe@email.com",
+        password,
+        role_id: coordinatorRole.id
+      },
+      {
+        name: "Jimmy",
+        email: "jimmy@email.com",
+        password,
+        role_id: respondantRole.id
+      }
+    ]
   });
 }
 
