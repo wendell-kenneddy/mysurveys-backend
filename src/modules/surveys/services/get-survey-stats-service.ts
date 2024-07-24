@@ -14,7 +14,7 @@ export class GetSurveyStatsService {
         answers: true,
         _count: {
           select: {
-            questions: true
+            respondants: true
           }
         }
       }
@@ -41,7 +41,7 @@ export class GetSurveyStatsService {
     return {
       frequency,
       author_id: survey.author_id,
-      respondantsTotal: survey.answers.length / survey._count.questions
+      respondantsTotal: survey._count.respondants
     };
   }
 }
