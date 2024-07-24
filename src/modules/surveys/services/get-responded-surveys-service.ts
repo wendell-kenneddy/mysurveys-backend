@@ -10,14 +10,18 @@ export class GetRespondedSurveysService {
       select: {
         responded_surveys: {
           select: {
-            id: true,
-            title: true,
-            description: true,
-            completed_at: true,
-            created_at: true,
-            author: {
+            survey: {
               select: {
-                name: true
+                id: true,
+                title: true,
+                description: true,
+                completed_at: true,
+                created_at: true,
+                author: {
+                  select: {
+                    name: true
+                  }
+                }
               }
             }
           }
