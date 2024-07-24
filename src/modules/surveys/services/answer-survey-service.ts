@@ -34,16 +34,16 @@ export class AnswerSurveyService {
       throw new ClientError("Survey has already been completed.");
     if (surveyAnswers.answers.length != survey._count.questions)
       throw new ClientError("Not enough answers provided.");
-
-    const respondant = await prisma.user.findUnique({
-      where: { id: surveyAnswers.respondant_id },
-      select: {
-        responded_surveys: { where: { id: survey.id } }
+    const respondant = await prisma.surveyRespondant.findUnique({
+      where: {
+        respondant_id_survey_id: {
+          survey_id: surveyAnswers.survey_id,
+          respondant_id: surveyAnswers.respondant_id
+        }
       }
     });
 
-    if (respondant?.responded_surveys.length)
-      throw new ClientError("User already responded this survey.");
+    if (respondant) throw new ClientError("User already answered the survey.");
 
     await prisma.answer.createMany({
       data: surveyAnswers.answers.map(a => ({
@@ -52,14 +52,10 @@ export class AnswerSurveyService {
         respondant_id: surveyAnswers.respondant_id
       }))
     });
-    await prisma.user.update({
-      where: { id: surveyAnswers.respondant_id },
+    await prisma.surveyRespondant.create({
       data: {
-        responded_surveys: {
-          connect: {
-            id: survey.id
-          }
-        }
+        respondant_id: surveyAnswers.respondant_id,
+        survey_id: surveyAnswers.survey_id
       }
     });
   }
