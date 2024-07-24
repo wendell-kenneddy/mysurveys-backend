@@ -12,7 +12,20 @@ export class LoginService {
   async execute(data: unknown) {
     const loginData = loginDataSchema.parse(data);
     const user = await prisma.user.findUnique({
-      where: { email: loginData.email }
+      where: { email: loginData.email },
+      select: {
+        id: true,
+        name: true,
+        password: true,
+        role: {
+          select: {
+            title: true,
+            permissions: {
+              select: { action: true }
+            }
+          }
+        }
+      }
     });
 
     if (!user) throw new ClientError("Invalid email or password.");
@@ -21,6 +34,11 @@ export class LoginService {
 
     if (!isCorrectPassword) throw new ClientError("Invalid email or password.");
 
-    return user.id;
+    return {
+      id: user.id,
+      name: user.name,
+      role: user.role.title,
+      permissions: user.role.permissions.map(p => p.action)
+    };
   }
 }
