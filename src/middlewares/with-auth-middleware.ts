@@ -47,8 +47,16 @@ export function withAuthMiddleware(
             }
 
             const refreshTokenPayload = p as JwtPayload;
-            const userID = refreshTokenPayload.userID as string;
-            const newAccessToken = JWTHandler.generateAccessToken(userID);
+            const id = refreshTokenPayload.userID as string;
+            const name = refreshTokenPayload.userName as string;
+            const role = refreshTokenPayload.userRole as string;
+            const permissions = refreshTokenPayload.userPermissions as string[];
+            const newAccessToken = JWTHandler.generateAccessToken({
+              id,
+              name,
+              role,
+              permissions
+            });
             res.setHeader("Authorization", newAccessToken);
             return res
               .status(200)
@@ -60,7 +68,10 @@ export function withAuthMiddleware(
       throw new Error(err.message);
     }
 
-    (req as any).userID = (payload as JwtPayload).userID;
+    (req as any).userID = (payload as JwtPayload).id;
+    (req as any).userName = (payload as JwtPayload).name;
+    (req as any).userRole = (payload as JwtPayload).role;
+    (req as any).userPermissions = (payload as JwtPayload).permissions;
   });
 
   next();
