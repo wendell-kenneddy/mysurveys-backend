@@ -6,27 +6,27 @@ import { LoginService } from "./services/login-service";
 export class AuthController {
   signup = async (req: Request, res: Response) => {
     const data = req.body;
-    const userID = await new SignupService().execute(data);
+    const user = await new SignupService().execute(data);
     const { accessToken, refreshToken } = this.generateAccessAndRefreshTokens(
-      userID
+      user
     );
     this.setTokensIntoResponse(accessToken, refreshToken, res);
-    return res.json({ userID });
+    return res.json({ id: user.id });
   };
 
   login = async (req: Request, res: Response) => {
     const data = req.body;
-    const userID = await new LoginService().execute(data);
+    const user = await new LoginService().execute(data);
     const { accessToken, refreshToken } = this.generateAccessAndRefreshTokens(
-      userID
+      user
     );
     this.setTokensIntoResponse(accessToken, refreshToken, res);
-    return res.json({ userID });
+    return res.json({ id: user.id });
   };
 
-  private generateAccessAndRefreshTokens(userID: string) {
-    const accessToken = JWTHandler.generateAccessToken(userID);
-    const refreshToken = JWTHandler.generateRefreshToken(userID);
+  private generateAccessAndRefreshTokens(user: unknown) {
+    const accessToken = JWTHandler.generateAccessToken(user);
+    const refreshToken = JWTHandler.generateRefreshToken(user);
     return { accessToken, refreshToken };
   }
 
